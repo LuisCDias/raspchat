@@ -37,11 +37,11 @@
       box-sizing: border-box;
     }
 
-    div.meta-message {
+    .meta-message {
       color: #333;
     }
 
-    div.incomingMessage {
+    .incomingMessage {
       margin: 10px;
       box-sizing: border-box;
     }
@@ -51,6 +51,7 @@
       height: 64px;
       float: left;
       margin: 0 8px 0 0;
+      border-radius: 10px;
     }
 
     .markdown-container img {
@@ -202,7 +203,10 @@
   </template>
 
   <template id="chat-message">
-  <div class="incomingMessage code-font" v-bind:class="{'meta-message': message.isMeta}">
+  <div v-if="message.isMeta">
+    <pre class="meta-message">{{{message.msg}}}</pre>
+  </div>
+  <div class="incomingMessage code-font" v-else>
     <img src="http://api.adorable.io/avatars/256/{{message.from}}.png" class="avatar" alt="{{message.from}}" />
     <div class="fromContainer">
       <span class="name">{{message.from}}</span>
