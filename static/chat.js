@@ -1,3 +1,10 @@
+/*
+Copyright (c) 2015 Zohaib
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 (function (vue) {
   var md = new markdownit();
 
@@ -5,16 +12,15 @@
     return md.render(value);
   });
 
-  var ChatMessage = vue.extend({
+  vue.component('chat-message', vue.extend({
     props: ['message'],
     template: '#chat-message',
     ready: function () {
       this.$dispatch("chat-message-added", this.message);
     }
-  });
-  vue.component('chat-message', ChatMessage);
+  }));
 
-  var ChatLog = vue.extend({
+  vue.component('chat-log', vue.extend({
     props: ['messages'],
     template: '#chat-messages',
     methods: {
@@ -22,10 +28,9 @@
         this.$el.scrollTop = this.$el.scrollHeight;
       },
     },
-  });
-  vue.component('chat-log', ChatLog);
+  }));
 
-  var ChatCompose = vue.extend({
+  vue.component('chat-compose', vue.extend({
     template: '#chat-compose',
     data: function () {
       return {
@@ -44,8 +49,18 @@
         this.$set('message', msg+'  ');
       },
     },
-  });
-  vue.component('chat-compose', ChatCompose);
+  }));
+
+  vue.component('app-bar', vue.extend({
+    template: '#app-bar',
+    data: function () {
+      return {
+        sound: false
+      };
+    },
+    methods: {
+    }
+  }));
 
   var groupsLog = {};
   var vueApp = new vue({
@@ -94,14 +109,17 @@
 
       onConnected: function () {
         this.$set('isConnected', true);
+        this.$broadcast("connection:on");
       },
 
       onDisconnected: function () {
         this.$set('isConnected', false);
+        this.$broadcast("connection:off");
       },
 
       onJoin: function (joinInfo) {
         groupsLog[joinInfo.to] = groupsLog[joinInfo.to] || [];
+        this.$broadcast("group:joined", joinInfo);
       },
 
       onSwitch: function (group) {
@@ -112,6 +130,7 @@
 
         this.$set('currentGroup.name', group);
         this.$set('currentGroup.messages', groupsLog[group]);
+        this.$broadcast("group:switched", group);
       },
 
       appendMessage: function (m) {
@@ -124,7 +143,7 @@
 
         var grouplog = groupsLog[m.to];
         grouplog.push(m);
-        this.$broadcast('new-message', m);
+        this.$broadcast('message:new', m);
       },
 
       appendMetaMessage: function (msg) {

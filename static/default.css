@@ -23,8 +23,26 @@ body {
   font-family: "Courier New",Courier,"Lucida Sans Typewriter","Lucida Typewriter",monospace;
 }
 
-* {
-  box-sizing: border-box;
+.chat-log {
+  display: block;
+  height: 90%;
+  max-height: 90%;
+  width: 100%;
+  overflow: auto;
+  color: black;
+  background: white;
+  padding: 10px;
+}
+
+.bottomBar {
+  position: relative;
+  margin: 2px;
+}
+
+.app-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .meta-message {
@@ -46,22 +64,6 @@ body {
 
 .markdown-container img {
   max-width: 100%;
-}
-
-.chat-log {
-  display: block;
-  height: 90%;
-  max-height: 90%;
-  width: 100%;
-  overflow: auto;
-  color: black;
-  background: white;
-  padding: 10px;
-}
-
-.bottomBar {
-  position: relative;
-  margin: 2px;
 }
 
 .fromContainer {
@@ -110,4 +112,13 @@ body {
   .btn {
     display: none;
   }
+
+  .bottomBar, .chat-log {
+    padding-left: 100px;
   }
+
+  .app-bar {
+    bottom: 0;
+    width: 100px;
+  }
+}

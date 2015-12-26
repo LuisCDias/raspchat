@@ -13,6 +13,7 @@
     <template v-if="isConnected">
       <slot name="logsHolder"><chat-log :messages="currentGroup.messages"/></slot>
       <slot name="composeHolder"><chat-compose @send-message="sendMessage"/></slot>
+      <slot name="appBar"><app-bar /></slot>
     </template>
     <button v-else @click="connect">Connect</button>
   </div>
@@ -25,6 +26,11 @@
                 @keydown.stop.prevent.tab="tabPressed"
                 placeholder="Type your message"></textarea>
       <input class='btn' type="button" style="" value="send" />
+    </div>
+  </template>
+
+  <template id="app-bar">
+    <div class="app-bar color-background-900">
     </div>
   </template>
 
