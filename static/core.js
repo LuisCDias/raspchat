@@ -5,6 +5,15 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+if (!Function.prototype.bind){
+  Function.prototype.bind = function (scope) {
+    var fn = this;
+    return function () {
+        return fn.apply(scope);
+    };
+  };
+}
+
 window.core = (function(win, doc) {
   var MSG_DELIMETER = "~~~~>";
   var MSG_SENDER_REGEX = /^([^@]+)@+(.+)$/i;
@@ -14,16 +23,8 @@ window.core = (function(win, doc) {
   var nickRegex = /^\/nick\s+([A-Za-z0-9]+)$/i;
   var gifRegex = /^\/gif\s+(.+)$/i;
   var joinRegex = /^\/join\s+([A-Za-z0-9]+)$/i;
+  var leaveRegex = /^\/leave\s+([A-Za-z0-9]+)$/i;
   var switchRegex = /^\/switch\s+([A-Za-z0-9]+)$/i;
-
-  if (!Function.prototype.bind){
-    Function.prototype.bind = function (scope) {
-      var fn = this;
-      return function () {
-          return fn.apply(scope);
-      };
-    };
-  }
 
   var giffer = {
     search: function (keywords, url_callback) {
@@ -42,38 +43,6 @@ window.core = (function(win, doc) {
       });
       oReq.open("get", "/gif?q="+keywords);
       oReq.send();
-    }
-  };
-
-  var EventEmitter = function () {
-    this._channels = {};
-  };
-
-  EventEmitter.prototype = {
-    fire: function (channel, data) {
-      var subscribes = this._channels[channel] || [],
-          l = subscribes.length;
-      while (l--) {
-        var cb = subscribes[l];
-        win.setTimeout(function () {
-          cb && cb.apply(this, data || [])
-        }, 0);
-      }
-    },
-
-    off: function (channel, handler) {
-      var subscribes = this._channels[channel] || [],
-          l = subscribes.length;
-
-      while (l--) {
-        if (subscribes[l] === handle) {
-          subscribes.splice(l, 1);
-        }
-      }
-    },
-
-    on: function (channel, handler) {
-      (this._channels[channel] = this._channels[channel] || []).push(handler);
     }
   };
 
@@ -134,6 +103,12 @@ window.core = (function(win, doc) {
       return true;
     }
 
+    match = cmd.match(leaveRegex);
+    if (match) {
+      callback("leave-group", match[1]);
+      return true;
+    }
+
     match = cmd.match(gifRegex);
     if (match) {
       giffer.search(match[1], function (url, obj) {
@@ -149,6 +124,38 @@ window.core = (function(win, doc) {
     }
 
     return false;
+  };
+
+  var EventEmitter = function () {
+    this._channels = {};
+  };
+
+  EventEmitter.prototype = {
+    fire: function (channel, data) {
+      var subscribes = this._channels[channel] || [],
+          l = subscribes.length;
+      while (l--) {
+        var cb = subscribes[l];
+        win.setTimeout(function () {
+          cb && cb.apply(this, data || [])
+        }, 0);
+      }
+    },
+
+    off: function (channel, handler) {
+      var subscribes = this._channels[channel] || [],
+          l = subscribes.length;
+
+      while (l--) {
+        if (subscribes[l] === handle) {
+          subscribes.splice(l, 1);
+        }
+      }
+    },
+
+    on: function (channel, handler) {
+      (this._channels[channel] = this._channels[channel] || []).push(handler);
+    }
   };
 
   var Transport = function (url) {

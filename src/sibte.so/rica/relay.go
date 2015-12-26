@@ -116,7 +116,7 @@ func (me *Relay) Start() {
 	me.sock.On("send-msg", me.onClientSend)
 	me.sock.On("set-nick", me.onClientSetNick)
 	me.sock.On("join-group", me.onClientJoin)
-	me.sock.On("leave-group", me.onClientJoin)
+	me.sock.On("leave-group", me.onClientLeave)
 	_nickRegistry.Register(me.clientid, me.nick)
 }
 

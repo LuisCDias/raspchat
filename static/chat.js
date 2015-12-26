@@ -76,6 +76,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       this.transport.events.on('disconnected', this.onDisconnected);
       this.transport.events.on('message', this.onMessage);
       this.transport.events.on('joined', this.onJoin);
+      this.transport.events.on('leave', this.onLeave);
       this.transport.events.on('switch', this.onSwitch);
     },
 
@@ -99,6 +100,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         this.transport.send(this.currentGroup.name, msg);
       },
 
+      switchGroup: function (grp) {
+        groupsLog[grp] = groupsLog[grp] || [];
+        this.onSwitch(grp);
+      },
+
       onMessage: function (m) {
         if (!this.defaultGroup) {
           this.defaultGroup = m.from;
@@ -120,6 +126,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       onJoin: function (joinInfo) {
         groupsLog[joinInfo.to] = groupsLog[joinInfo.to] || [];
         this.$broadcast("group:joined", joinInfo);
+        if (this.currentGroup.name == this.defaultGroup) {
+          this.switchGroup(joinInfo.to);
+        }
+      },
+
+      onLeave: function (info) {
+        groupsLog[info.to] = null;
+        this.$broadcast("group:left", info);
+        if (this.currentGroup.name == info.to) {
+          this.switchGroup(this.defaultGroup);
+        }
       },
 
       onSwitch: function (group) {
