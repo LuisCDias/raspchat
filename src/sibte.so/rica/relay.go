@@ -150,6 +150,7 @@ func (me *Relay) onClientSetNick(msg string) {
 	}
 
 	me.sock.Emit("new-msg", changeMsg)
+	me.sock.Emit("nick-set", me.nick)
 }
 
 func (me *Relay) onClientJoin(msg string) {
