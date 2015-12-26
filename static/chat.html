@@ -13,9 +13,12 @@
     <template v-if="isConnected">
       <slot name="logsHolder"><chat-log :messages="currentGroup.messages"/></slot>
       <slot name="composeHolder"><chat-compose @send-message="sendMessage"/></slot>
-      <slot name="appBar"><app-bar /></slot>
+      <slot name="appBar"><app-bar :user-id="nick"/></slot>
     </template>
-    <button v-else @click="connect">Connect</button>
+    <form class="login-form" @submit.stop.prevent="connect" v-else>
+      <input type="text" v-model="nick" />
+      <button type="submit">Connect</button>
+    </form>
   </div>
 
   <template id="chat-compose">
@@ -31,6 +34,31 @@
 
   <template id="app-bar">
     <div class="app-bar color-background-900">
+      <div class="app-bar-container">
+        <table style="padding: 10px 0;">
+          <tr>
+            <td>
+              <img :src="userId | avatar_url" class="avatar" />
+            </td>
+            <td class="code-font" style="font-size: 16px; overflow: hidden;">
+              {{userId}}
+            </td>
+          </tr>
+        </table>
+
+        <div class="list-container">
+          <groups-list />
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="groups-list">
+    <div class="code-font">Groups</div>
+    <div class="code-font groups-list" v-for="g in groups">
+      <a href="#" class="group-entry {{selected == g.name ? 'active-group' : ''}}" @click.stop.prevent="selectGroup(g.name)">
+        {{g.name}} - {{g.unread}}
+      </a>
     </div>
   </template>
 
@@ -47,7 +75,7 @@
     <pre class="meta-message">{{{message.msg}}}</pre>
   </div>
   <div class="incomingMessage code-font" v-else>
-    <img src="http://api.adorable.io/avatars/256/{{message.from}}.png" class="avatar" alt="{{message.from}}" />
+    <img :src="message.from | avatar_url" class="avatar" alt="{{message.from}}" />
     <div class="fromContainer">
       <span class="name">{{message.from}}</span>
       <span style="font-size: 12px">{{message.delivery_time}}</span>
@@ -55,14 +83,15 @@
     <div class="markdown-container">
     {{{message.msg | markdown}}}
     </div>
-    <div style="display: block; clear: both;">&nbsp;</div>
+    <div class="cf">&nbsp;</div>
   </div>
   </template>
 
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/5.0.2/markdown-it.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.13/vue.min.js"></script>
+<!--script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.13/vue.min.js"></script-->
+<script src="./vue.js"></script>
 <script src="./core.js"></script>
 <script src="./chat.js"></script>
 </html>

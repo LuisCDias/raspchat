@@ -23,6 +23,17 @@ body {
   font-family: "Courier New",Courier,"Lucida Sans Typewriter","Lucida Typewriter",monospace;
 }
 
+.cf {
+  display: block;
+  clear: both;
+}
+
+.login-form {
+  display: block;
+  clear: both;
+  color: white;
+}
+
 .chat-log {
   display: block;
   height: 90%;
@@ -43,6 +54,38 @@ body {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.app-bar-container {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+}
+
+.group-entry, .group-entry:active{
+  text-decoration: none;
+  color: white;
+  display: block;
+  clear: both;
+  margin: 7px 0 7px 10px;
+  padding: 5px;
+  font-size: 16px;
+
+}
+
+.group-entry:hover {
+   background: #00695C;
+}
+
+.active-group {
+  background: #fff;
+  color: #000;
+}
+
+.active-group:hover {
+  background: #fff;
 }
 
 .meta-message {
@@ -114,11 +157,11 @@ body {
   }
 
   .bottomBar, .chat-log {
-    padding-left: 100px;
+    padding-left: 200px;
   }
 
   .app-bar {
     bottom: 0;
-    width: 100px;
+    width: 200px;
   }
 }

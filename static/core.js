@@ -178,6 +178,10 @@ window.core = (function(win, doc) {
         this.events.fire('connecting');
       },
 
+      setNick: function (nick) {
+        this.send(SERVER_ALIAS, "/nick "+nick);
+      },
+
       send: function (to, msg) {
         var me = this;
         var processed = processComand(msg, function(cmd, value){
