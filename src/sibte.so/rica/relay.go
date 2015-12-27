@@ -121,13 +121,13 @@ func (me *Relay) Start() {
 }
 
 func (me *Relay) Stop() {
-	_nickRegistry.Unregister(me.clientid)
-
 	for grp, _ := range me.groupsJoined {
 		me.sock.BroadcastTo(grp, "group-leave", me.nick+"@"+grp)
 		me.groupInfo.RemoveUser(grp, me.clientid)
 	}
 	me.sock = nil
+
+	_nickRegistry.Unregister(me.clientid)
 }
 
 func (me *Relay) onClientSetNick(msg string) {

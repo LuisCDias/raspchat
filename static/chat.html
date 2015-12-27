@@ -6,6 +6,7 @@
   <meta charset="utf-8">
   <meta name="robots" content="noindex">
   <title>Raspchat</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
   <link href='./default.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
@@ -16,8 +17,10 @@
       <slot name="appBar"><app-bar :user-id="nick"/></slot>
     </template>
     <form class="login-form" @submit.stop.prevent="connect" v-else>
-      <input type="text" v-model="nick" />
-      <button type="submit">Connect</button>
+      <center>
+        <input type="text" placeholder="Enter a nick" v-model="nick" />
+        <button type="submit">Connect</button>
+      </center>
     </form>
   </div>
 
@@ -28,19 +31,29 @@
                 @keydown.stop.prevent.enter="enterPressed"
                 @keydown.stop.prevent.tab="tabPressed"
                 placeholder="Type your message"></textarea>
-      <input class='btn' type="button" style="" value="send" />
+      <input class='btn' type="button" style="" @click.stop.prevent="enterPressed" value="send" />
     </div>
   </template>
 
   <template id="app-bar">
-    <div class="app-bar color-background-900">
+    <div class="app-bar color-background-900 code-font">
       <div class="app-bar-container">
-        <table style="padding: 10px 0;">
+        <div class="additional-buttons">
+          <div>Settings</div>
+          <sound-notification-button :ignore-for="userId"/>
+        </div>
+
+        <table style="padding: 10px 0 10px 5px;">
+          <tr>
+            <td colspan="2">
+              You are
+            </td>
+          </tr>
           <tr>
             <td>
               <img :src="userId | avatar_url" class="avatar" />
             </td>
-            <td class="code-font" style="font-size: 16px; overflow: hidden;">
+            <td style="font-size: 16px; overflow: hidden;">
               {{userId}}
             </td>
           </tr>
@@ -53,11 +66,19 @@
     </div>
   </template>
 
+  <template id="sound-notification-button">
+    <a href="#" class="inline-button code-font" @click.stop.prevent="toggle">
+      <i class="fa fa-bell" v-if="enabled"></i>
+      <i class="fa fa-bell-o" v-else></i>
+    </a>
+  </template>
+
   <template id="groups-list">
     <div class="code-font">Groups</div>
     <div class="code-font groups-list" v-for="g in groups">
       <a href="#" class="group-entry {{selected == g.name ? 'active-group' : ''}}" @click.stop.prevent="selectGroup(g.name)">
-        {{g.name}} - {{g.unread}}
+        <span>{{g.name}}</span><span v-if="g.unread"> - {{g.unread}}</span>
+        <i class="fa fa-times" style="float: right; font-size: 17px;" @click.stop.prevent="leaveGroup(g.name)" v-if="$index"></i>
       </a>
     </div>
   </template>
@@ -90,8 +111,7 @@
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/5.0.2/markdown-it.min.js"></script>
-<!--script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.13/vue.min.js"></script-->
-<script src="./vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.13/vue.min.js"></script>
 <script src="./core.js"></script>
 <script src="./chat.js"></script>
 </html>

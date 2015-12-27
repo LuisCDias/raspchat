@@ -62,17 +62,17 @@ body {
   width: 100%;
   height: 100%;
   color: #fff;
+  overflow: hidden;
 }
 
 .group-entry, .group-entry:active{
   text-decoration: none;
-  color: white;
   display: block;
   clear: both;
-  margin: 7px 0 7px 10px;
+  color: white;
+  margin: 7px 0;
   padding: 5px;
   font-size: 16px;
-
 }
 
 .group-entry:hover {
@@ -120,6 +120,24 @@ body {
   color: #00695C;
 }
 
+.list-container {
+  padding-left: 5px;
+  max-height: 60%;
+  height: 60%;
+}
+
+.additional-buttons {
+  padding: 10px 5px;
+}
+
+.inline-button, .inline-button:active {
+  text-decoration: none;
+  height: 24px;
+  font-size: 20px;
+  line-height: 20px;
+  color: #fff;
+}
+
 /* Mobile */
 @media(max-width: 600px) {
   .msg {
@@ -139,7 +157,21 @@ body {
   }
 
   .bottomBar {
+    position: fixed;
     height: 42px;
+    width: 100%;
+  }
+
+  .chat-log {
+  }
+
+  .app-bar {
+    display: none;
+  }
+
+  .avatar {
+    width: 32px !important;
+    height: 32px !important;
   }
 }
 

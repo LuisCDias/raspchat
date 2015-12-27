@@ -8,6 +8,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 (function (vue) {
   var md = new markdownit();
 
+  var showNotification = function (message) {
+    if (!("Notification" in window)) {
+      return false;
+    } else if (Notification.permission === "granted") {
+      var notification = new Notification(message);
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission(function (permission) {
+        if (permission === "granted") {
+          var notification = new Notification(message);
+        }
+      });
+    }
+
+    return true;
+  };
+
   vue.filter('markdown', function (value) {
     return md.render(value);
   });
@@ -42,8 +58,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       };
     },
     methods: {
-      enterPressed: function () {
+      enterPressed: function (e) {
         var msg = this.message;
+        if (e.shiftKey){
+          this.$set('message', msg+'\n');
+          return;
+        }
+
         this.$set('message', '');
         this.$dispatch('send-message', msg);
       },
@@ -89,6 +110,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         this.$dispatch("switch", id);
       },
 
+      leaveGroup: function (id) {
+        this.$dispatch("leave", id);
+      },
+
       groupSwitch: function (group) {
         this.selectGroup(group);
       },
@@ -107,10 +132,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
       newMessage: function (msg) {
         if (this.selected == msg.to || !this.groupsInfo[msg.to]) {
-          return false;
+          return true;
         }
 
         this._setUnread(msg.to, this._getUnread(msg.to) + 1);
+        return true;
       },
 
       _getUnread: function (g) {
@@ -120,6 +146,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       _setUnread: function (g, count) {
         vue.set(this.groupsInfo[g], "unread", count);
         return true;
+      }
+    }
+  }));
+
+  var ToggleButtonMixin = {
+    data: function () {
+      return {enabled: false};
+    },
+    methods: {
+      toggle: function () {
+        this.$set("enabled", !this.$get("enabled"));
+      }
+    }
+  };
+
+  vue.component('sound-notification-button', vue.extend({
+    template: '#sound-notification-button',
+    mixins: [ToggleButtonMixin],
+    props: ["ignoreFor"],
+    ready: function () {
+      this.$on("message_new", this.onNotification);
+    },
+    methods: {
+      onNotification: function (msg) {
+        if (this.enabled && msg.from != this.ignoreFor){
+          var snd = new Audio("/static/notif.mp3");
+          snd.play();
+        }
       }
     }
   }));
@@ -144,6 +198,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       this.transport.events.on('nick-changed', this.changeNick);
 
       this.$on("switch", this.onSwitch);
+      this.$on("leave", function (group) {
+        this.transport.send(group, "/leave "+group);
+      });
       this.$watch("currentGroup.name", function (newVal, oldVal) {
         this.$broadcast("group_switched", newVal);
       });
